@@ -4,10 +4,10 @@ import psycopg2
 
 from . import db
 
-def createapp(test_config=None):
+def create_app(test_config=None):
 
   app = Flask("planner")
-  app.secretkey = "super_secret"
+  app.secretkey = "very_secret_key"
   app.config.from_mapping(DATABASE = "plannerdata")
   
   if (test_config is not None):

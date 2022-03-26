@@ -12,7 +12,7 @@ def get_db():
     g.db = psycopg2.connect(f'dbname = {dbname}')
   return g.db
   
-def close_db():
+def close_db(e=None):
   db = g.pop('db', None)
   if db is not None:
     db.close()
@@ -26,13 +26,13 @@ def init_db():
   p.execute(sql_code)
   p.close()
   db.commit()
-  close()
+  close_db()
   
 @click.command('initdb', help = 'Initialises the Database')
 @with_appcontext
-def init_db_commmand():
+def init_db_command():
   init_db()
-  click.echo('Database has been initialised')
+  click.echo('Database "plannerdata" has been initialised')
   
 def init_app(app):
   app.teardown_appcontext(close_db)
