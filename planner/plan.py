@@ -6,6 +6,6 @@ bp = Blueprint('plan', 'plan', url_prefix = '')
 
 @bp.route('/')
 def dashboard():
-  return render_template('login.html')
+  return render_template("login.html", url_prefix="")
   
 

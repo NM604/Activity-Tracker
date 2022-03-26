@@ -13,7 +13,8 @@ def createapp(test_config=None):
   if (test_config is not None):
     app.config.update(test_config)
   
-  os.makedirs(app.instance_path)
+  try:
+    os.makedirs(app.instance_path)
   
   except OSError:
     pass
