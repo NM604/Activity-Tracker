@@ -134,7 +134,6 @@ def thisday():
   this_date = str(fyear)+'-'+fmonth+'-'+fday
   cursor.execute("""select name, description, deadline from tasks where oid = %s and deadline = %s;""", (user_id, this_date))
   info = cursor.fetchall()
-  
   return render_template('thisday.html',info=info)
   
   
@@ -166,7 +165,10 @@ def add_taskdetails():
       taskid = cursor.fetchone()
       tid = taskid[0]
       session["tid"] = tid
+      session["deadline"] = deadline
+      conn.commit()
       redirect(url_for("plan.shopping"))
+    conn.commit()
     return redirect(url_for("plan.calender"))
     
     
@@ -186,27 +188,57 @@ def add_taskdetails():
   conn = db.get_db()
   cursor = conn.cursor()
   tid = session.get("tid")
+  deadline = session.get("deadline")
   
   if request.method == 'POST':
   
     itemname = request.form['itemname']
     itemquant = request.form['itemquant']
-    cursor.execute("""insert into shoppinglist (item, qty, tid) values (%s, %s, %s);""", (itemname, itemquant, tid))
+    cursor.execute("""insert into shoppinglist (item, qty, tid, deadline) values (%s, %s, %s, %s);""", (itemname, itemquant, tid, deadline))
     conn.commit()
   
     status = request.form['status']
     
     if status == 'y' or status == 'Y':
       session["tid"] = None
+      session["deadline"] = None
+      conn.commit()
       return redirect(url_for("plan.calender")    
+    conn.commit()
     return redirect(url_for("plan.additems"))
     
     
     
     
-@bp.route('/deletetask')
+@bp.route('/deletetask', methods=['POST', 'GET'])
 def deletetask():
-  
+  if request.method == 'POST':
+    name = request.form['name']
+    conn = db.get_db()
+    cursor = conn.cursor()
+    cursor.execute("""delete from tasks where name = %s;""",(name,))
+    cursor.execute("""select shopping from tasks where name = %s;""",(name,))
+    shoppingstatus = cursor.fetchone()
+    shop_status = shoppingstatus[0]
+    if shop_status == 'y':
+      cursor.execute("""select id from tasks where name = %s;""",(name,))
+      t = cursor.fetchone()
+      tasksid = t[0]
+      cursor.execute("""delete from shoppinglist where tid = %s;""",(tasksid,))
+    conn.commit()
+    return redirect(url_for("plan.calender"))
+    
+    
+    
+    
+@bp.route('/update')
+def update():
+  conn = db.get_db()
+  cursor = conn.cursor()
+  dtime = datetime.datetime.now().strftime("%Y-%m-%d")
+  cursor.execute("""delete from tasks where deadline = %s;""",(dtime,))
+  cursor.execute("""select shopping from tasks where deadline = %s;""",(deadline,))
+  conn.commit()
   return redirect(url_for("plan.calender"))
 
   
