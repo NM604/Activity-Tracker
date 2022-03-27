@@ -53,7 +53,7 @@ def create():
   
   
   
-@bp.route('/createuser', methods=['POST', 'GET'])
+@bp.route('/createuser', methods=['POST'])
 def createuser():
   status = None
   username = request.form['username']
@@ -63,14 +63,14 @@ def createuser():
   cur.execute("""select username from users where username = %s;""", (username,))
   n = cur.fetchone()
   if n is not None:
-    status = 'Username already exists'
-    return redirect(url_for("plan.create", status=status), 302)
-  cursor.execute("""insert into users (username, password) values (%s, %s);""", (username, password))
+    flash('Username already exists')
+    return redirect(url_for("plan.create"), 302)
+  cur.execute("""insert into users (username, password) values (%s, %s);""", (username, password))
   conn.commit()
-  return redirect('/login', 302)
-  
-  
-  
+  return redirect('/', 302)
+
+
+
 @bp.route('/calender')
 def calender():
 
@@ -99,9 +99,6 @@ def delete_task():
 
 @bp.route('/shopping', methods=['POST', 'GET'])
 def shopping():
-
-
-
 
 
 

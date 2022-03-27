@@ -105,9 +105,17 @@
 }
 
 .menu {
+  text-transform: uppercase;
   position: absolute;
   top: 25px;
   left: 70px;
+}
+
+.out {
+  text-transform: uppercase;
+  position: absolute;
+  top: 25px;
+  right: 25px;
 }
 
 
