@@ -27,7 +27,7 @@ def login():
     cursor.execute("""select password from users where username = %s;""", (username,))
     pw = cursor.fetchone()
     if pw[0] != password:
-      status = 'Incorrect password, please try again'
+      status = 'Incorrect password'
     else:
       cursor.execute("""select id from users where username = %s;""", (username,))
       user = cursor.fetchone()
@@ -46,6 +46,7 @@ def login():
 @bp.route('/logout')
 def logout():
   session["username"] = None
+  session["id"] = None
   return redirect("/", 302)   
   
   
@@ -89,11 +90,11 @@ def calender():
   if int(fday)<10:
     r = str(fday)
     fday = '0'+r
-  fmonth = request.args.get("m",1)
+  fmonth = request.args.get("d",1)
   if int(fmonth)<10:
     x = str(fmonth)
     fmonth = '0'+x
-  fyear = request.args.get("y",1)
+  fyear = request.args.get("d",1)
   ffdate = str(fyear)+'-'+fmonth+'-'+fday
   
   current_time = datetime.datetime.now() 
@@ -114,3 +115,98 @@ def calender():
   
 
 
+@bp.route('/thisday')
+def thisday():
+  conn = db.get_db()
+  cursor = conn.cursor()
+  this_day = request.args.get("d",1)
+  this_month = request.args.get("d",1)
+  this_year = request.args.get("d",1)
+  
+  if int(this_day)<10:
+    r = str(this_day)
+    this_day = '0'+r
+  
+  if int(this_month)<10:
+    x = str(this_month)
+    this_month = '0'+x
+    
+  this_date = str(fyear)+'-'+fmonth+'-'+fday
+  cursor.execute("""select name, description, deadline from tasks where oid = %s and deadline = %s;""", (user_id, this_date))
+  info = cursor.fetchall()
+  
+  return render_template('thisday.html',info=info)
+  
+  
+  
+  
+@bp.route('/addtask')
+def add_task():
+  return render_template('add_task.html')
+
+
+ 
+@bp.route('/addtaskdetails', methods=['POST', 'GET'])
+def add_taskdetails():
+  if request.method == 'POST':
+    name = request.form['name']
+    description = request.form['description']
+    deadline = request.form['deadline']
+    oid = session.get("userid")
+    shopping_status = request.form['shopping_status']
+    conn = db.get_db()
+    cursor = conn.cursor()
+    
+    cursor.execute("""insert into tasks (name, description, deadline, oid, shopping) values (%s, %s, %s, %s);""", (name, description, deadline, oid, shopping_status))
+    
+    conn.commit()
+    
+    if shopping_status=='y' or shopping_status=='Y':
+      cursor.execute("""select id from tasks where name = %s;""",(name,))
+      taskid = cursor.fetchone()
+      tid = taskid[0]
+      session["tid"] = tid
+      redirect(url_for("plan.shopping"))
+    return redirect(url_for("plan.calender"))
+    
+    
+    
+    
+    
+@bp.route('/shopping')
+def shopping():
+  return render_template('shopping.html')    
+  
+  
+  
+  
+    
+@bp.route('/additems', methods=['POST', 'GET'])
+def add_taskdetails():  
+  conn = db.get_db()
+  cursor = conn.cursor()
+  tid = session.get("tid")
+  
+  if request.method == 'POST':
+  
+    itemname = request.form['itemname']
+    itemquant = request.form['itemquant']
+    cursor.execute("""insert into shoppinglist (item, qty, tid) values (%s, %s, %s);""", (itemname, itemquant, tid))
+    conn.commit()
+  
+    status = request.form['status']
+    
+    if status == 'y' or status == 'Y':
+      session["tid"] = None
+      return redirect(url_for("plan.calender")    
+    return redirect(url_for("plan.additems"))
+    
+    
+    
+    
+@bp.route('/deletetask')
+def deletetask():
+  
+  return redirect(url_for("plan.calender"))
+
+  
