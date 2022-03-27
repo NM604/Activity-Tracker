@@ -71,6 +71,8 @@ def createuser():
 
 
 
+
+
 @bp.route('/calender')
 def calender():
 
@@ -99,6 +101,3 @@ def delete_task():
 
 @bp.route('/shopping', methods=['POST', 'GET'])
 def shopping():
-
-
-
