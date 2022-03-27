@@ -6,7 +6,6 @@ import psycopg2
 from . import db
 
 def create_app(test_config=None):
-
   app = Flask("planner")
   app.secretkey = "very_secret_key"
   app.config["SESSION_PERMANENT"] = False

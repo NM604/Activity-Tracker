@@ -10,8 +10,8 @@ bp = Blueprint('plan', 'plan', url_prefix = '')
 @bp.route('/')
 def dashboard():
   if not session.get("username"):
-    return redirect("/login")
-  return render_template("dashboard.html", url_prefix="")
+    return redirect(url_for("plan.login"))
+  return render_template("dashboard.html")
   
   
 
@@ -24,13 +24,16 @@ def login():
     username = request.form['username']
     password = request.form['password']
     session["username"] = username
-    cursor.execute("""select pass from users where username = %s;""", (username,))
+    cursor.execute("""select password from users where username = %s;""", (username,))
     pw = cursor.fetchone()
     if pw[0] != password:
       status = 'Incorrect password, please try again'
     else:
       return redirect('/', 302)
+  if status is not None:
     return render_template('login.html', status = status)
+  else:
+    return render_template('login.html')
     
     
     
@@ -52,6 +55,7 @@ def create():
   
 @bp.route('/createuser', methods=['POST', 'GET'])
 def createuser():
+  status = None
   username = request.form['username']
   password = request.form['password']
   conn = db.get_db()
@@ -59,13 +63,45 @@ def createuser():
   cur.execute("""select username from users where username = %s;""", (username,))
   n = cur.fetchone()
   if n is not None:
-    flash('Username already exists')
-    return redirect('/create', 302)
+    status = 'Username already exists'
+    return redirect(url_for("plan.create", status=status), 302)
   cursor.execute("""insert into users (username, password) values (%s, %s);""", (username, password))
   conn.commit()
   return redirect('/login', 302)
   
   
   
-  
+@bp.route('/calender')
+def calender():
+
+
+
+
+@bp.route('/today', methods=['POST', 'GET'])
+def today():
+
+
+
+
+
+@bp.route('/addtask', methods=['POST', 'GET'])
+def add_task():
+
+
+
+
+
+def delete_task():
+
+
+
+
+
+@bp.route('/shopping', methods=['POST', 'GET'])
+def shopping():
+
+
+
+
+
 
