@@ -90,11 +90,11 @@ def calender():
   if int(fday)<10:
     r = str(fday)
     fday = '0'+r
-  fmonth = request.args.get("d",1)
+  fmonth = request.args.get("m",1)
   if int(fmonth)<10:
     x = str(fmonth)
     fmonth = '0'+x
-  fyear = request.args.get("d",1)
+  fyear = request.args.get("y",1)
   ffdate = str(fyear)+'-'+fmonth+'-'+fday
   
   current_time = datetime.datetime.now() 
@@ -120,18 +120,10 @@ def thisday():
   conn = db.get_db()
   cursor = conn.cursor()
   this_day = request.args.get("d",1)
-  this_month = request.args.get("d",1)
-  this_year = request.args.get("d",1)
-  
-  if int(this_day)<10:
-    r = str(this_day)
-    this_day = '0'+r
-  
-  if int(this_month)<10:
-    x = str(this_month)
-    this_month = '0'+x
-    
-  this_date = str(fyear)+'-'+fmonth+'-'+fday
+  this_month = request.args.get("m",1)
+  this_year = request.args.get("y",1)
+  user_id = session.get("userid")    
+  this_date = str(this_year)+'-'+this_month+'-'+this_day
   cursor.execute("""select name, description, deadline from tasks where oid = %s and deadline = %s;""", (user_id, this_date))
   info = cursor.fetchall()
   return render_template('thisday.html',info=info)
@@ -184,7 +176,7 @@ def shopping():
   
     
 @bp.route('/additems', methods=['POST', 'GET'])
-def add_taskdetails():  
+def add_items():  
   conn = db.get_db()
   cursor = conn.cursor()
   tid = session.get("tid")
@@ -203,7 +195,7 @@ def add_taskdetails():
       session["tid"] = None
       session["deadline"] = None
       conn.commit()
-      return redirect(url_for("plan.calender")    
+      return redirect(url_for("plan.calender"))    
     conn.commit()
     return redirect(url_for("plan.additems"))
     

@@ -223,7 +223,6 @@ a{
 }
 
 
-/* required */
 .calendar{
 	position: absolute;
 	border-radius: 4px;
@@ -398,6 +397,46 @@ a{
 :-moz-placeholder {color: #ffffff; }
 ::-moz-placeholder {color: #ffffff; }
 :-ms-input-placeholder {color: #ffffff; }
+
+.styled-table {
+  border-collapse:collapse;
+  margin: 25px 0;
+  font-size: 0.9em;
+  min-width:400px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+  background-color: #F0FFFF;
+  font-family: sans-serif;
+}
+
+.styled-table thead tr {
+  background-color: #6495ED;
+  color: #ffffff;
+  text-align: left;
+  vertical-align: middle; 
+}
+
+.styled-table thead tr th h6{
+   color:White; 
+   font-family: sans-serif; 
+   text-transform: uppercase;
+}
+
+.styled-table th,
+.styled-table td {
+  padding: 15px 100px;
+}
+
+.styled-table tbody tr {
+  border-bottom: thin solid #dddddd;
+}
+
+.styled-table tbody tr:nth-of-type(even) {
+  background-color: #ADD8E6;
+}
+
+.styled-table tbody tr:last-of-type {
+  border-bottom: 2px solid #009879;
+}
 
 
 

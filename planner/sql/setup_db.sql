@@ -12,7 +12,7 @@ CREATE TABLE tasks (
   id SERIAL PRIMARY KEY,
   name TEXT NOT NULL,
   oid INTEGER,
-  decription TEXT,
+  description TEXT,
   deadline DATE,
   shopping TEXT NOT NULL,
   FOREIGN KEY (oid) references users(id) ON DELETE CASCADE

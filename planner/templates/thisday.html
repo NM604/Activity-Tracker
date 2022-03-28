@@ -1,6 +1,41 @@
 {% extends "base.html" %}
 {% block body %}
 
+<div class="menu">
+      <h6 style="color:White; font-family: sans-serif;"> &emsp;<a href="/calender" style="color:White; font-family: sans-serif;">Calender</a> &emsp; <a href="/today" style="color:White; font-family: sans-serif;">Today</a> &emsp; <a href="{{url_for('plan.add_task')}}" style="color:White;">Add</a></h6>
+</div>
 
+<div class="out">
+<h6 style="color:White; font-family: sans-serif;">
+<a href="/logout" style="color:White; font-family: sans-serif;">
+Logout
+</a>
+</h6>
+</div>
+
+
+<table class="styled-table">
+  <thead>
+    <tr>
+      <th><h6>Task</h6></th>
+      <th><h6>Progress</h6></th>
+      <th><h6>Ending on</h6></th>
+      <th> </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      {% for name, description, deadline in info %}
+      <td>{{name}}</td>
+      <td>{{description}}</td>
+      <td><progress id="file" value={{p}} max="100"> {{p}} </progress></td>
+      <td>{{deadline}}</td>
+      <td><div class = "inputBx">
+						<a href="{{url_for('plan.deletetask')}}?name={{name}}">Mark Done</a>
+						</div></td>
+		</tr>
+		{%endfor%}
+		</tbody>
+	</table>
 
 {% endblock %}
