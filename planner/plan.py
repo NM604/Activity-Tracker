@@ -203,6 +203,8 @@ def add_items():
     
     
     
+    
+    
 @bp.route('/deletetask')
 def deletetask():
   name = request.args.get("name",1)
@@ -219,6 +221,8 @@ def deletetask():
   cursor.execute("""delete from tasks where name = %s;""",(name,))
   conn.commit()
   return redirect(url_for("plan.calender"))
+    
+    
     
     
     
