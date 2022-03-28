@@ -63,6 +63,19 @@
   box-shadow: inset 0 0 25px rgba(0,0,0,0.2);
 }
 
+.inputBx label {
+  width: 40%;
+  outline: none;
+  border: 1px, solid rgba(255,255,255,0.2);
+  background: transparent;
+  padding: 8px 10px;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 300;
+  box-shadow: inset 0 0 25px rgba(0,0,0,0.2);
+}
+
 .inputBx a {
   width: 100%;
   outline: none;
@@ -92,6 +105,14 @@
   font-weight: 500;
   letter-spacing: 1px;
   cursor: pointer;
+}
+
+
+.inputBx input[type="checkbox"]
+{
+    vertical-align:middle;
+    max-width: 28px;
+    padding: 1px 1px;
 }
 
 .inputBx a {
@@ -263,6 +284,10 @@ a{
 	margin: 0px;
 }
 
+.calendar ol{
+	margin: 0px;
+}
+
 .calendar ul li{
 	list-style: none;
 }
@@ -392,7 +417,6 @@ a{
 }
 
 
-/* placeholder color */
 ::-webkit-input-placeholder {color: #ffffff; }
 :-moz-placeholder {color: #ffffff; }
 ::-moz-placeholder {color: #ffffff; }

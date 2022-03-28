@@ -19,16 +19,16 @@ Logout
 				<div class="content">
 					<h1 class="date">{{today}}<span>{{fdate}}</span></h1>
 					<div class="notes">
-						<ul class="noteList">
-						{% if fday!=1 and fmonth!=1 and fyear!=1 and tasks != null%}
-						<li>Tasks for {{fday}}-{{fmonth}}-{{fyear}}</li>
-						{% endif %}
-						{% if tasks != null %}
+						<ol class="noteList" start="0">
+						{% if fday!=1 and fmonth!=1 and fyear!=1 and listtasks%}
+						<li style="list-style:none;">Tasks for {{fday}}-{{fmonth}}-{{fyear}}</li>
 						{% for tasks in listtasks %}
-							<li>{{tasks}}</li>
+						{% for task in tasks %}
+							<li>{{task}}</li>
+						{%endfor%}
 						{%endfor%}
 						{% endif %}
-						</ul>
+						</ol>
 						<div class = "inputBx">
 						<a href="{{url_for('plan.thisday')}}?d={{fday}}&m={{fmonth}}&y={{fyear}}">More Info</a>
 						</div>

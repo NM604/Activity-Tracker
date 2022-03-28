@@ -18,18 +18,15 @@ Logout
   <thead>
     <tr>
       <th><h6>Task</h6></th>
-      <th><h6>Progress</h6></th>
-      <th><h6>Ending on</h6></th>
+      <th><h6>Description</h6></th>
       <th> </th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      {% for name, description, deadline in info %}
+      {% for name, description in info %}
       <td>{{name}}</td>
       <td>{{description}}</td>
-      <td><progress id="file" value={{p}} max="100"> {{p}} </progress></td>
-      <td>{{deadline}}</td>
       <td><div class = "inputBx">
 						<a href="{{url_for('plan.deletetask')}}?name={{name}}">Mark Done</a>
 						</div></td>

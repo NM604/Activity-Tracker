@@ -12,7 +12,8 @@ bp = Blueprint('plan', 'plan', url_prefix = '')
 def dashboard():
   if not session.get("username"):
     return redirect(url_for("plan.login"))
-  return render_template("dashboard.html")
+  userid = session.get("userid")
+  return render_template("dashboard.html", userid=userid)
   
   
 
@@ -33,8 +34,8 @@ def login():
       user = cursor.fetchone()
       userid = user[0]
       session["username"] = username
-      session["id"] = userid
-      return redirect('/', 302)
+      session["userid"] = userid
+      return redirect(url_for("plan.dashboard"))
   if status is not None:
     return render_template('login.html', status = status)
   else:
@@ -46,7 +47,8 @@ def login():
 @bp.route('/logout')
 def logout():
   session["username"] = None
-  session["id"] = None
+  session["userid"] = None
+  session["password"] = None
   return redirect("/", 302)   
   
   
@@ -81,11 +83,10 @@ def createuser():
 
 @bp.route('/calender')
 def calender():
-  
-  listtasks = None
+
   conn = db.get_db()
   cursor = conn.cursor()
-  user_id = session.get("userid")
+  oid = session.get("userid")
   fday = request.args.get("d",1)
   if int(fday)<10:
     r = str(fday)
@@ -106,9 +107,8 @@ def calender():
   fdate = current.strftime("%B %d")
   m = current.strftime("%m")
   
-  for i in range(0,31):
-    if i == request.args.get("d"):
-      cursor.execute("""select name from tasks where oid = %s and deadline = %s;""", (user_id, ffdate))
+  cursor.execute("""select name from tasks where oid = %s and deadline = %s order by deadline;""", (oid, ffdate))
+  listtasks = cursor.fetchall()
   
   return render_template('calender.html', year=year,month=month,day=day,today=today,fdate=fdate, m=m, listtasks=listtasks, fday=fday, fmonth=fmonth, fyear=fyear)
   
@@ -117,6 +117,8 @@ def calender():
 
 @bp.route('/thisday')
 def thisday():
+  p = []
+  d = datetime.datetime.now().strftime("%Y-%m-%d")
   conn = db.get_db()
   cursor = conn.cursor()
   this_day = request.args.get("d",1)
@@ -124,7 +126,7 @@ def thisday():
   this_year = request.args.get("y",1)
   user_id = session.get("userid")    
   this_date = str(this_year)+'-'+this_month+'-'+this_day
-  cursor.execute("""select name, description, deadline from tasks where oid = %s and deadline = %s;""", (user_id, this_date))
+  cursor.execute("""select name, description from tasks where oid = %s and deadline = %s;""", (user_id, this_date))
   info = cursor.fetchall()
   return render_template('thisday.html',info=info)
   
@@ -143,24 +145,26 @@ def add_taskdetails():
     name = request.form['name']
     description = request.form['description']
     deadline = request.form['deadline']
+    shopping_status = request.form.get('shopping_status')
     oid = session.get("userid")
-    shopping_status = request.form['shopping_status']
+    d = datetime.datetime.now().strftime("%Y-%m-%d")
     conn = db.get_db()
     cursor = conn.cursor()
     
-    cursor.execute("""insert into tasks (name, description, deadline, oid, shopping) values (%s, %s, %s, %s);""", (name, description, deadline, oid, shopping_status))
+    if shopping_status is None:
+      cursor.execute("""insert into tasks (name, description, deadline, oid, shopping) values (%s, %s, %s, %s, %s);""", (name, description, deadline, oid, 'n'))
+      conn.commit()
     
-    conn.commit()
     
-    if shopping_status=='y' or shopping_status=='Y':
+    
+    if shopping_status is not None:
+      cursor.execute("""insert into tasks (name, description, deadline, oid, shopping) values (%s, %s, %s, %s, %s);""", (name, description, deadline, oid, 'n'))
+      conn.commit()
       cursor.execute("""select id from tasks where name = %s;""",(name,))
       taskid = cursor.fetchone()
       tid = taskid[0]
       session["tid"] = tid
-      session["deadline"] = deadline
-      conn.commit()
       redirect(url_for("plan.shopping"))
-    conn.commit()
     return redirect(url_for("plan.calender"))
     
     
@@ -177,23 +181,20 @@ def shopping():
     
 @bp.route('/additems', methods=['POST', 'GET'])
 def add_items():  
-  conn = db.get_db()
-  cursor = conn.cursor()
-  tid = session.get("tid")
-  deadline = session.get("deadline")
   
   if request.method == 'POST':
-  
+    conn = db.get_db()
+    cursor = conn.cursor()
+    tid = session.get("tid")
     itemname = request.form['itemname']
     itemquant = request.form['itemquant']
     cursor.execute("""insert into shoppinglist (item, qty, tid, deadline) values (%s, %s, %s, %s);""", (itemname, itemquant, tid, deadline))
     conn.commit()
   
-    status = request.form['status']
+    shstatus = request.form.get('shstatus')
     
     if status == 'y' or status == 'Y':
       session["tid"] = None
-      session["deadline"] = None
       conn.commit()
       return redirect(url_for("plan.calender"))    
     conn.commit()
@@ -202,23 +203,22 @@ def add_items():
     
     
     
-@bp.route('/deletetask', methods=['POST', 'GET'])
+@bp.route('/deletetask')
 def deletetask():
-  if request.method == 'POST':
-    name = request.form['name']
-    conn = db.get_db()
-    cursor = conn.cursor()
-    cursor.execute("""delete from tasks where name = %s;""",(name,))
-    cursor.execute("""select shopping from tasks where name = %s;""",(name,))
-    shoppingstatus = cursor.fetchone()
-    shop_status = shoppingstatus[0]
-    if shop_status == 'y':
-      cursor.execute("""select id from tasks where name = %s;""",(name,))
-      t = cursor.fetchone()
-      tasksid = t[0]
-      cursor.execute("""delete from shoppinglist where tid = %s;""",(tasksid,))
-    conn.commit()
-    return redirect(url_for("plan.calender"))
+  name = request.args.get("name",1)
+  conn = db.get_db()
+  cursor = conn.cursor()
+  cursor.execute("""select shopping from tasks where name = %s;""",(name,))
+  shoppingstatus = cursor.fetchone()
+  shop_status = shoppingstatus[0]
+  if shop_status == 'y':
+    cursor.execute("""select id from tasks where name = %s;""",(name,))
+    t = cursor.fetchone()
+    tasksid = t[0]
+    cursor.execute("""delete from shoppinglist where tid = %s;""",(tasksid,))
+  cursor.execute("""delete from tasks where name = %s;""",(name,))
+  conn.commit()
+  return redirect(url_for("plan.calender"))
     
     
     
@@ -228,8 +228,18 @@ def update():
   conn = db.get_db()
   cursor = conn.cursor()
   dtime = datetime.datetime.now().strftime("%Y-%m-%d")
-  cursor.execute("""delete from tasks where deadline = %s;""",(dtime,))
-  cursor.execute("""select shopping from tasks where deadline = %s;""",(deadline,))
+  cursor.execute("""select name from tasks where deadline = %s;""",(d,))
+  taskn = cursor.fetchone()
+  taskname = taskn[0]
+  cursor.execute("""select shopping from tasks where name = %s;""",(taskname,))
+  shoppingstatus = cursor.fetchone()
+  shop_status = shoppingstatus[0]
+  if shop_status == 'y':
+    cursor.execute("""select id from tasks where name = %s;""",(taskname,))
+    t = cursor.fetchone()
+    tasksid = t[0]
+    cursor.execute("""delete from shoppinglist where tid = %s;""",(tasksid,))
+  cursor.execute("""delete from tasks where name = %s;""",(taskname,))
   conn.commit()
   return redirect(url_for("plan.calender"))
 
