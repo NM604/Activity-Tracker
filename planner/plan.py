@@ -158,13 +158,16 @@ def add_taskdetails():
     
     
     if shopping_status is not None:
-      cursor.execute("""insert into tasks (name, description, deadline, oid, shopping) values (%s, %s, %s, %s, %s);""", (name, description, deadline, oid, 'n'))
+      cursor.execute("""insert into tasks (name, description, deadline, oid, shopping) values (%s, %s, %s, %s, %s);""", (name, description, deadline, oid, 'y'))
       conn.commit()
       cursor.execute("""select id from tasks where name = %s;""",(name,))
       taskid = cursor.fetchone()
       tid = taskid[0]
       session["tid"] = tid
-      redirect(url_for("plan.shopping"))
+      session["deadline"] = deadline
+      conn.commit()
+      shop = shopping_status
+      return redirect(url_for("plan.shopping",shop=shop))
     return redirect(url_for("plan.calender"))
     
     
@@ -186,6 +189,7 @@ def add_items():
     conn = db.get_db()
     cursor = conn.cursor()
     tid = session.get("tid")
+    deadline = session.get("deadline")
     itemname = request.form['itemname']
     itemquant = request.form['itemquant']
     cursor.execute("""insert into shoppinglist (item, qty, tid, deadline) values (%s, %s, %s, %s);""", (itemname, itemquant, tid, deadline))
@@ -193,12 +197,13 @@ def add_items():
   
     shstatus = request.form.get('shstatus')
     
-    if status == 'y' or status == 'Y':
+    if shstatus is not None:
       session["tid"] = None
+      session["deadline"] = None
       conn.commit()
       return redirect(url_for("plan.calender"))    
     conn.commit()
-    return redirect(url_for("plan.additems"))
+    return redirect(url_for("plan.shopping"))
     
     
     
