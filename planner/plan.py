@@ -12,8 +12,14 @@ bp = Blueprint('plan', 'plan', url_prefix = '')
 def dashboard():
   if not session.get("username"):
     return redirect(url_for("plan.login"))
-  userid = session.get("userid")
-  return render_template("dashboard.html", userid=userid)
+  username = session.get("username")
+  conn = db.get_db()
+  cursor = conn.cursor()
+  cursor.execute("""select id from users where username = %s;""", (username,))
+  user = cursor.fetchone()
+  if not user:
+    return redirect(url_for("plan.login"))
+  return render_template("dashboard.html")
   
   
 
@@ -25,6 +31,11 @@ def login():
   if request.method == 'POST':
     username = request.form['username']
     password = request.form['password']
+    cursor.execute("""select id from users where username = %s;""", (username,))
+    user = cursor.fetchone()
+    if not user:
+      status = "User does not exist"
+      return render_template('login.html', status = status)
     cursor.execute("""select password from users where username = %s;""", (username,))
     pw = cursor.fetchone()
     if pw[0] != password:
