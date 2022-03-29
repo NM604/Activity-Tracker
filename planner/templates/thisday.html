@@ -27,35 +27,45 @@ Logout
   </thead>
   <tbody>
     <tr>
-      {% for name, description in info %}
+      {% for id, name, description, shopping in info %}
       <td>{{name}}</td>
       <td>{{description}}</td>
       {% if listshopping%}
+      {% if shopping == 'y'%}
+      <td>
+      <table>
       <thead>
         <tr>
         <th><h6>Item</h6></th>
         <th><h6>Qty</h6></th>
+        <th> </th>
         </tr>
-      </thead>
-      <tbody>
+        </thead>
+        <tbody>
         <tr>
-        {% for item, qty in listshopping %}
-        {% if id == tid%}
+        {% for item, qty, tid in listshopping %}
+        {% if id == tid %}
         <td>{{item}}</td>
         <td>{{qty}}</td>
-        {% endif %}
         <td><div class = "inputBx">
 						<a href="{{url_for('plan.deleteitem')}}?name={{name}}&item={{item}}">Delete</a>
 						</div></td>
+        {% endif %}
         </tr>
 		  {%endfor%}
+		  </td>
 		  </tbody>
+		  </table>
+		  {% else %}
+		  <td> </td>
+      {% endif %}
       {% endif %}
       <td><div class = "inputBx">
 						<a href="{{url_for('plan.deletetask')}}?name={{name}}">Mark Done</a>
 						</div></td>
 		</tr>
 		{%endfor%}
+		</td>
 		</tbody>
 	</table>
 

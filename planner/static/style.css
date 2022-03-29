@@ -423,10 +423,11 @@ a{
 :-ms-input-placeholder {color: #ffffff; }
 
 .styled-table {
+  width: 70%;
   border-collapse:collapse;
   margin: 25px 0;
   font-size: 0.9em;
-  min-width:400px;
+  min-width: 300px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
   background-color: #F0FFFF;
   font-family: sans-serif;
@@ -435,7 +436,7 @@ a{
 .styled-table thead tr {
   background-color: #6495ED;
   color: #ffffff;
-  text-align: left;
+  text-align: center;
   vertical-align: middle; 
 }
 
@@ -447,11 +448,13 @@ a{
 
 .styled-table th,
 .styled-table td {
-  padding: 15px 100px;
+  padding: 10px 50px;
 }
 
 .styled-table tbody tr {
   border-bottom: thin solid #dddddd;
+  vertical-align: middle;
+  text-align: left;
 }
 
 .styled-table tbody tr:nth-of-type(even) {

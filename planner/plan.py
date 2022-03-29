@@ -137,7 +137,7 @@ def thisday():
   this_year = request.args.get("y",1)
   user_id = session.get("userid")    
   this_date = str(this_year)+'-'+this_month+'-'+this_day
-  cursor.execute("""select id, name, description from tasks where oid = %s and deadline = %s;""", (user_id, this_date))
+  cursor.execute("""select id, name, description, shopping from tasks where oid = %s and deadline = %s;""", (user_id, this_date))
   info = cursor.fetchall()
   cursor.execute("""select item, qty, tid from shoppinglist where deadline = %s;""", (this_date,))
   listshopping = cursor.fetchall()
@@ -231,6 +231,13 @@ def deletetask():
   cursor.execute("""select shopping from tasks where name = %s;""",(name,))
   shoppingstatus = cursor.fetchone()
   shop_status = shoppingstatus[0]
+  
+  cursor.execute("""select deadline from tasks where name = %s;""",(name,))
+  dtime = cursor.fetchone()
+  deadline = dtime[0]
+  deadlinetime = deadline.strftime("%Y-%m-%d")
+  l = deadlinetime.split("-")
+  
   if shop_status == 'y':
     cursor.execute("""select id from tasks where name = %s;""",(name,))
     t = cursor.fetchone()
@@ -238,7 +245,7 @@ def deletetask():
     cursor.execute("""delete from shoppinglist where tid = %s;""",(tasksid,))
   cursor.execute("""delete from tasks where name = %s;""",(name,))
   conn.commit()
-  return redirect(url_for("plan.thisday"))
+  return redirect(url_for("plan.thisday", d=l[2], m=l[1], y=l[0]))
     
     
     
@@ -255,13 +262,20 @@ def deleteitem():
   cursor.execute("""select shopping from tasks where name = %s;""",(name,))
   shoppingstatus = cursor.fetchone()
   shop_status = shoppingstatus[0]
+  
+  cursor.execute("""select deadline from tasks where name = %s;""",(name,))
+  dtime = cursor.fetchone()
+  deadline = dtime[0]
+  deadlinetime = deadline.strftime("%Y-%m-%d")
+  l = deadlinetime.split("-")
+  
   if shop_status == 'y':
     cursor.execute("""select id from tasks where name = %s;""",(name,))
     t = cursor.fetchone()
     tasksid = t[0]
     cursor.execute("""delete from shoppinglist where tid = %s and item = %s;""",(tasksid,item))
   conn.commit()
-  return redirect(url_for("plan.thisday"))
+  return redirect(url_for("plan.thisday", d=l[2], m=l[1], y=l[0]))
 
 
     
