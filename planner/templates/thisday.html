@@ -19,6 +19,9 @@ Logout
     <tr>
       <th><h6>Task</h6></th>
       <th><h6>Description</h6></th>
+      {% if listshopping%}
+      <th><h6>Shopping List</h6></th>
+      {% endif %}
       <th> </th>
     </tr>
   </thead>
@@ -27,6 +30,27 @@ Logout
       {% for name, description in info %}
       <td>{{name}}</td>
       <td>{{description}}</td>
+      {% if listshopping%}
+      <thead>
+        <tr>
+        <th><h6>Item</h6></th>
+        <th><h6>Qty</h6></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+        {% for item, qty in listshopping %}
+        {% if id == tid%}
+        <td>{{item}}</td>
+        <td>{{qty}}</td>
+        {% endif %}
+        <td><div class = "inputBx">
+						<a href="{{url_for('plan.deleteitem')}}?name={{name}}&item={{item}}">Delete</a>
+						</div></td>
+        </tr>
+		  {%endfor%}
+		  </tbody>
+      {% endif %}
       <td><div class = "inputBx">
 						<a href="{{url_for('plan.deletetask')}}?name={{name}}">Mark Done</a>
 						</div></td>

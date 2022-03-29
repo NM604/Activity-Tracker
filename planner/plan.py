@@ -137,9 +137,11 @@ def thisday():
   this_year = request.args.get("y",1)
   user_id = session.get("userid")    
   this_date = str(this_year)+'-'+this_month+'-'+this_day
-  cursor.execute("""select name, description from tasks where oid = %s and deadline = %s;""", (user_id, this_date))
+  cursor.execute("""select id, name, description from tasks where oid = %s and deadline = %s;""", (user_id, this_date))
   info = cursor.fetchall()
-  return render_template('thisday.html',info=info)
+  cursor.execute("""select item, qty, tid from shoppinglist where deadline = %s;""", (this_date,))
+  listshopping = cursor.fetchall()
+  return render_template('thisday.html', info=info, listshopping=listshopping)
   
   
   
@@ -236,8 +238,32 @@ def deletetask():
     cursor.execute("""delete from shoppinglist where tid = %s;""",(tasksid,))
   cursor.execute("""delete from tasks where name = %s;""",(name,))
   conn.commit()
-  return redirect(url_for("plan.calender"))
+  return redirect(url_for("plan.thisday"))
     
+    
+    
+    
+
+
+
+@bp.route('/deleteitem')
+def deleteitem():
+  name = request.args.get("name",1)
+  item = request.args.get("item",1)
+  conn = db.get_db()
+  cursor = conn.cursor()
+  cursor.execute("""select shopping from tasks where name = %s;""",(name,))
+  shoppingstatus = cursor.fetchone()
+  shop_status = shoppingstatus[0]
+  if shop_status == 'y':
+    cursor.execute("""select id from tasks where name = %s;""",(name,))
+    t = cursor.fetchone()
+    tasksid = t[0]
+    cursor.execute("""delete from shoppinglist where tid = %s and item = %s;""",(tasksid,item))
+  conn.commit()
+  return redirect(url_for("plan.thisday"))
+
+
     
     
     

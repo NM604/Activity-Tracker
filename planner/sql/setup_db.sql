@@ -23,5 +23,5 @@ CREATE TABLE shoppinglist (
   qty TEXT NOT NULL,
   tid INTEGER,
   deadline DATE,
-  FOREIGN KEY (Tid) references tasks(id) ON DELETE CASCADE
+  FOREIGN KEY (tid) references tasks(id) ON DELETE CASCADE
   );
